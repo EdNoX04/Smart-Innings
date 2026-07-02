@@ -1,0 +1,49 @@
+name: Update data & retrain SmartInnings
+
+# The self-updating engine. Runs on GitHub's servers so the app stays current
+# for years without any manual work.
+on:
+  schedule:
+    - cron: "0 3 * * 1"        # every Monday 03:00 UTC
+  workflow_dispatch: {}          # lets the in-app button (and you) run it on demand
+
+permissions:
+  contents: write                # allow committing refreshed model artifacts
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r ml/requirements.txt
+
+      - name: Ingest latest data into the datastore
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}   # cloud Postgres (Neon/Supabase)
+        run: python ml/ingest.py
+
+      - name: Retrain models
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python ml/train.py
+
+      - name: Commit refreshed model artifacts
+        run: |
+          git config user.name  "smartinnings-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add ml/artifacts/*.json
+          if git diff --staged --quiet; then
+            echo "No model changes."
+          else
+            git commit -m "chore: auto-update models ($(date -u +%Y-%m-%d))"
+            git push
+          fi
+      # Vercel auto-redeploys on the new commit, serving the refreshed model.

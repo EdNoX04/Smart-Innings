@@ -1,0 +1,5 @@
+# Root requirements — used by the Vercel Python serverless function (api/index.py).
+# Kept intentionally light (no pandas): predictions only load JSON artifacts.
+fastapi==0.115.0
+numpy>=1.24
+pydantic>=2.0

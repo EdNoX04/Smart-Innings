@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# OS
+.DS_Store
+
+# Keep model artifacts and data CSVs tracked? Data is large (~25MB) — your call.
+# Uncomment to exclude the big ball-by-ball file from git:
+# data/Ball_By_Ball_Match_Data.csv

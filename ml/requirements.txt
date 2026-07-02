@@ -1,0 +1,9 @@
+# Training / ingest environment (used locally and by the GitHub Action).
+numpy>=1.24
+pandas>=2.0
+# Preferred training engine (falls back to the built-in NumPy booster if absent):
+xgboost>=2.0
+scikit-learn>=1.3
+# Only needed when DATABASE_URL is set (cloud Postgres):
+SQLAlchemy>=2.0
+psycopg2-binary>=2.9
